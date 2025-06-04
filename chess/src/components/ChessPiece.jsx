@@ -11,26 +11,23 @@ const Piece = styled.div.attrs(props => ({
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 40px;
   cursor: grab;
   user-select: none;
-  color: ${props => props.color === 'white' ? '#fff' : '#000'};
-  text-shadow: ${props => props.color === 'white' ? '0 0 2px #000' : '0 0 2px #fff'};
   transform: ${props => props.isdragging ? 'scale(1.1)' : 'scale(1)'};
   transition: transform 0.2s ease;
   z-index: ${props => props.isdragging ? 1 : 0};
 `;
 
-const getPieceSymbol = (type) => {
-  const symbols = {
-    king: '♔',
-    queen: '♕',
-    rook: '♖',
-    bishop: '♗',
-    knight: '♘',
-    pawn: '♙'
-  };
-  return symbols[type] || '';
+const PieceImage = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+`;
+
+const getPieceImage = (type, color) => {
+  const colorPrefix = color === 'white' ? 'w' : 'b';
+  const piecePrefix = type === 'knight' ? 'kn' : type.charAt(0);
+  return `/src/assets/Images/${colorPrefix}${piecePrefix}.png`;
 };
 
 const ChessPiece = ({ piece, currentTurn }) => {
@@ -55,7 +52,7 @@ const ChessPiece = ({ piece, currentTurn }) => {
       color={piece.color}
       isdragging={isdragging}
     >
-      {getPieceSymbol(piece.type)}
+      <PieceImage src={getPieceImage(piece.type, piece.color)} alt={`${piece.color} ${piece.type}`} />
     </Piece>
   );
 };
