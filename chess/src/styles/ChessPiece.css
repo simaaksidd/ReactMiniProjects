@@ -1,0 +1,22 @@
+.chess-piece {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s ease;
+  z-index: 0;
+}
+
+.chess-piece[data-dragging="true"] {
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.chess-piece-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+} 

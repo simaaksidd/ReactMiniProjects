@@ -1,28 +1,6 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import styled from 'styled-components';
-
-const Piece = styled.div.attrs(props => ({
-  'data-dragging': props.isdragging,
-  'data-color': props.color
-}))`
-  width: 50px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: grab;
-  user-select: none;
-  transform: ${props => props.isdragging ? 'scale(1.1)' : 'scale(1)'};
-  transition: transform 0.2s ease;
-  z-index: ${props => props.isdragging ? 1 : 0};
-`;
-
-const PieceImage = styled.img`
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-`;
+import '../styles/ChessPiece.css';
 
 const getPieceImage = (type, color) => {
   const colorPrefix = color === 'white' ? 'w' : 'b';
@@ -44,16 +22,21 @@ const ChessPiece = ({ piece, currentTurn }) => {
   } : undefined;
 
   return (
-    <Piece
+    <div
       ref={setNodeRef}
       style={style}
       {...listeners}
       {...attributes}
-      color={piece.color}
-      isdragging={isdragging}
+      className="chess-piece"
+      data-dragging={isdragging}
+      data-color={piece.color}
     >
-      <PieceImage src={getPieceImage(piece.type, piece.color)} alt={`${piece.color} ${piece.type}`} />
-    </Piece>
+      <img 
+        src={getPieceImage(piece.type, piece.color)} 
+        alt={`${piece.color} ${piece.type}`}
+        className="chess-piece-image"
+      />
+    </div>
   );
 };
 
