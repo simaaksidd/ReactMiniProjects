@@ -21,8 +21,8 @@ function App() {
   const [activeId, setActiveId] = useState(null);
   const [boardState, setBoardState] = useState(initialBoardState);
   const [validMoves, setValidMoves] = useState([]);
-  const [whiteTime, setWhiteTime] = useState(300); // 5 minutes in seconds
-  const [blackTime, setBlackTime] = useState(300); // 5 minutes in seconds
+  const [whiteTime, setWhiteTime] = useState(300); 
+  const [blackTime, setBlackTime] = useState(300); 
   const [capturedPieces, setCapturedPieces] = useState({ white: [], black: [] });
 
   useEffect(() => {
@@ -117,8 +117,15 @@ function App() {
 
   return (
     <div className="app-container">
+      {gameStarted && (
+        <div className="turn-indicator">
+          <div className="turn-label">Current Turn:</div>
+          <div className="turn-player">{currentTurn === 'white' ? 'Player 1' : 'Player 2'}</div>
+        </div>
+      )}
       <div className="game-container">
         <div className="player-section">
+          <div className="player-label">Player 1</div>
           <div className="timer">{formatTime(whiteTime)}</div>
           <div className="captured-pieces">
             {capturedPieces.white.map((piece, index) => {
@@ -136,7 +143,6 @@ function App() {
           </div>
         </div>
         <div className="board-container">
-          {gameStarted && <div className="turn-indicator">{currentTurn}'s turn</div>}
           <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <ChessBoard 
               boardState={boardState} 
@@ -149,6 +155,7 @@ function App() {
           </DndContext>
         </div>
         <div className="player-section">
+          <div className="player-label">Player 2</div>
           <div className="timer">{formatTime(blackTime)}</div>
           <div className="captured-pieces">
             {capturedPieces.black.map((piece, index) => {
