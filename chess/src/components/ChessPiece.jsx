@@ -11,24 +11,18 @@ const getPieceImage = (type, color) => {
 const ChessPiece = ({ piece, currentTurn }) => {
   const isDisabled = piece.color !== currentTurn;
   
-  const { attributes, listeners, setNodeRef, transform, isdragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: piece.id,
     data: piece,
     disabled: isDisabled
   });
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
-
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...listeners}
       {...attributes}
-      className="chess-piece"
-      data-dragging={isdragging}
+      className={`chess-piece ${isDragging ? 'dragging' : ''}`}
       data-color={piece.color}
     >
       <img 

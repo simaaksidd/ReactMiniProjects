@@ -30,15 +30,9 @@ function App() {
     if (gameStarted) {
       timer = setInterval(() => {
         if (currentTurn === 'white') {
-          setWhiteTime(prev => {
-            if (prev <= 0) return 0;
-            return prev - 1;
-          });
+          setWhiteTime(prev => prev <= 0 ? 0 : prev - 1);
         } else {
-          setBlackTime(prev => {
-            if (prev <= 0) return 0;
-            return prev - 1;
-          });
+          setBlackTime(prev => prev <= 0 ? 0 : prev - 1);
         }
       }, 1000);
     }
@@ -51,37 +45,26 @@ function App() {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  const getValidMovesForPiece = (piece) => {
+    if (!piece || piece.color !== currentTurn) return [];
+    
+    const moveFunctions = {
+      pawn: getValidPawnMoves,
+      knight: getValidKnightMoves,
+      bishop: getValidBishopMoves,
+      rook: getValidRookMoves,
+      queen: getValidQueenMoves,
+      king: getValidKingMoves
+    };
+
+    return moveFunctions[piece.type]?.(piece, boardState) || [];
+  };
+
   const handleDragStart = (event) => {
     const { active } = event;
     setActiveId(active.id);
-    
     const piece = boardState.find(p => p.id === active.id);
-    if (piece && piece.color === currentTurn) {
-      switch (piece.type) {
-        case 'pawn':
-          setValidMoves(getValidPawnMoves(piece, boardState));
-          break;
-        case 'knight':
-          setValidMoves(getValidKnightMoves(piece, boardState));
-          break;
-        case 'bishop':
-          setValidMoves(getValidBishopMoves(piece, boardState));
-          break;
-        case 'rook':
-          setValidMoves(getValidRookMoves(piece, boardState));
-          break;
-        case 'queen':
-          setValidMoves(getValidQueenMoves(piece, boardState));
-          break;
-        case 'king':
-          setValidMoves(getValidKingMoves(piece, boardState));
-          break;
-        default:
-          setValidMoves([]);
-      }
-    } else {
-      setValidMoves([]);
-    }
+    setValidMoves(getValidMovesForPiece(piece));
   };
 
   const handleDragEnd = (event) => {
@@ -149,7 +132,7 @@ function App() {
               currentTurn={currentTurn} 
               validMoves={validMoves}
             />
-            <DragOverlay>
+            <DragOverlay dropAnimation={null}>
               {activeId ? <ChessPiece piece={activePiece} currentTurn={currentTurn} /> : null}
             </DragOverlay>
           </DndContext>
