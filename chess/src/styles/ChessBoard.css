@@ -36,5 +36,9 @@
 }
 
 .chess-square[data-valid-move="true"]::after {
+  background-color: rgba(0, 255, 0, 0.25);
+}
+
+.chess-square[data-capture="true"]::after {
   background-color: rgba(255, 0, 0, 0.25);
 } 
