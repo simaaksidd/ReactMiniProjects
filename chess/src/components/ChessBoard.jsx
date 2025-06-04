@@ -19,6 +19,7 @@ const ChessBoard = ({ boardState, validMoves = [], currentTurn }) => {
           const piece = getPieceAtPosition(position);
           const iseven = (rankIndex + fileIndex) % 2 === 0;
           const isvalidmove = validMoves.includes(position);
+          const isCapture = isvalidmove && piece && piece.color !== currentTurn;
           const { setNodeRef } = useDroppable({
             id: position,
           });
@@ -28,7 +29,8 @@ const ChessBoard = ({ boardState, validMoves = [], currentTurn }) => {
               key={position} 
               className="chess-square"
               data-even={iseven}
-              data-valid-move={isvalidmove}
+              data-valid-move={isvalidmove && !isCapture}
+              data-capture={isCapture}
               ref={setNodeRef}
             >
               {piece && <ChessPiece piece={piece} currentTurn={currentTurn} />}

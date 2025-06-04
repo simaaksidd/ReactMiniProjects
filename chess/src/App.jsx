@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import ChessBoard from './components/ChessBoard';
 import ChessPiece from './components/ChessPiece';
@@ -10,7 +10,8 @@ import {
   getValidBishopMoves,
   getValidRookMoves,
   getValidQueenMoves,
-  getValidKingMoves 
+  getValidKingMoves,
+  getPieceAt
 } from './utils/chessRules';
 import './styles/App.css';
 
@@ -20,6 +21,35 @@ function App() {
   const [activeId, setActiveId] = useState(null);
   const [boardState, setBoardState] = useState(initialBoardState);
   const [validMoves, setValidMoves] = useState([]);
+  const [whiteTime, setWhiteTime] = useState(300); // 5 minutes in seconds
+  const [blackTime, setBlackTime] = useState(300); // 5 minutes in seconds
+  const [capturedPieces, setCapturedPieces] = useState({ white: [], black: [] });
+
+  useEffect(() => {
+    let timer;
+    if (gameStarted) {
+      timer = setInterval(() => {
+        if (currentTurn === 'white') {
+          setWhiteTime(prev => {
+            if (prev <= 0) return 0;
+            return prev - 1;
+          });
+        } else {
+          setBlackTime(prev => {
+            if (prev <= 0) return 0;
+            return prev - 1;
+          });
+        }
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [gameStarted, currentTurn]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const handleDragStart = (event) => {
     const { active } = event;
@@ -60,12 +90,21 @@ function App() {
     if (over && active.id !== over.id) {
       const activePiece = boardState.find(p => p.id === active.id);
       const overSquare = over.id;
+      const pieceAtTarget = getPieceAt(overSquare, boardState);
       
       if (isValidMove(activePiece, overSquare, boardState)) {
         setBoardState(prevState => {
-          const newState = prevState.filter(p => p.id !== active.id);
+          const newState = prevState.filter(p => p.id !== active.id && p.position !== overSquare);
           return [...newState, { ...activePiece, position: overSquare }];
         });
+
+        if (pieceAtTarget) {
+          setCapturedPieces(prev => ({
+            ...prev,
+            [currentTurn]: [...prev[currentTurn], pieceAtTarget]
+          }));
+        }
+
         setCurrentTurn(prev => prev === 'white' ? 'black' : 'white');
       }
     }
@@ -79,7 +118,23 @@ function App() {
   return (
     <div className="app-container">
       <div className="game-container">
-        <div className="timer">00:00</div>
+        <div className="player-section">
+          <div className="timer">{formatTime(whiteTime)}</div>
+          <div className="captured-pieces">
+            {capturedPieces.white.map((piece, index) => {
+              const colorPrefix = piece.color === 'white' ? 'w' : 'b';
+              const piecePrefix = piece.type === 'knight' ? 'kn' : piece.type.charAt(0);
+              return (
+                <img 
+                  key={`white-captured-${index}`}
+                  src={`/src/assets/Images/${colorPrefix}${piecePrefix}.png`}
+                  alt={`${piece.color} ${piece.type}`}
+                  className="captured-piece"
+                />
+              );
+            })}
+          </div>
+        </div>
         <div className="board-container">
           {gameStarted && <div className="turn-indicator">{currentTurn}'s turn</div>}
           <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -93,7 +148,23 @@ function App() {
             </DragOverlay>
           </DndContext>
         </div>
-        <div className="timer">00:00</div>
+        <div className="player-section">
+          <div className="timer">{formatTime(blackTime)}</div>
+          <div className="captured-pieces">
+            {capturedPieces.black.map((piece, index) => {
+              const colorPrefix = piece.color === 'white' ? 'w' : 'b';
+              const piecePrefix = piece.type === 'knight' ? 'kn' : piece.type.charAt(0);
+              return (
+                <img 
+                  key={`black-captured-${index}`}
+                  src={`/src/assets/Images/${colorPrefix}${piecePrefix}.png`}
+                  alt={`${piece.color} ${piece.type}`}
+                  className="captured-piece"
+                />
+              );
+            })}
+          </div>
+        </div>
       </div>
       {!gameStarted && (
         <div className="start-overlay">
